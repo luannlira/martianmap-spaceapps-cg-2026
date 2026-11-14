@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
+<head>: <meta charset="utf-8">
 <link rel="stylesheet" href="vendor/leaflet.css">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -82,7 +82,7 @@ nav button[aria-selected="true"]{color:var(--accent);font-weight:600;border-top-
   <section id="t-mapa" aria-label="Mapa">
     <div class="banner" id="banner"><b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span></div>
     <div id="map" class="map" role="img" aria-label="Mapa da área com você, o abrigo e a zona de risco"></div>
-    <p class="legend"><span><b style="background:var(--dust)"></b>Você</span><span><b style="background:var(--safe)"></b>Abrigo</span><span><b style="background:var(--danger)"></b>Risco</span></p>
+    <p class="legend"><span><b style="background:var(--accent)"></b>Você</span><span><b style="background:var(--safe)"></b>Abrigo</span><span><b style="background:var(--danger)"></b>Risco</span></p>
     <p class="legend" id="offTxt" style="margin-top:6px">Mapa atualizado pelo satélite agora.</p>
   </section>
 
@@ -114,18 +114,25 @@ nav button[aria-selected="true"]{color:var(--accent);font-weight:600;border-top-
 </div>
 <script src="vendor/leaflet.js"></script> 
 <script>
-const W = 991, H = 991;               // tamanho da imagem do terreno, em pixels
+/* ---------- Utilidades ---------- */
+const $ = s => document.querySelector(s);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- Mapa (Leaflet) ---------- */
+// W e H DEVEM ser o tamanho real de assets/terreno.jpg (mudou a imagem? mude aqui também)
+const W = 991, H = 991;
 const limites = [[0, 0], [H, W]];
 const mapa = L.map('map', { crs: L.CRS.Simple, minZoom: -1, maxZoom: 2 });
-L.imageOverlay('../../data/samples/terreno.jpg', limites, {
+L.imageOverlay('assets/terreno.jpg', limites, {
   attribution: 'Imagem: https://trek.nasa.gov/mars/'
 }).addTo(mapa);
 mapa.fitBounds(limites);
 
-// Posições no formato [y, x], em pixels da imagem
-L.circleMarker([150, 200], { radius: 10, color: '#e8a56a', fillOpacity: 1 }).addTo(mapa).bindTooltip('Você');
-L.circleMarker([830, 760], { radius: 10, color: '#6fe3c8', fillOpacity: 1 }).addTo(mapa).bindTooltip('Abrigo 2');
-L.circle([420, 560], { radius: 130, color: '#ff5a36' }).addTo(mapa).bindTooltip('Ladeira íngreme');
+// MOCK: posições e rota fixas, sem escala (px → metros) definida. Formato [y, x] em pixels da imagem.
+const COR = { voce: css('--accent'), abrigo: css('--safe'), risco: css('--danger') };
+L.circleMarker([150, 200], { radius: 10, color: COR.voce, fillColor: COR.voce, fillOpacity: 1 }).addTo(mapa).bindTooltip('Você');
+L.circleMarker([830, 760], { radius: 10, color: COR.abrigo, fillColor: COR.abrigo, fillOpacity: 1 }).addTo(mapa).bindTooltip('Abrigo 2');
+L.circle([420, 560], { radius: 130, color: COR.risco }).addTo(mapa).bindTooltip('Ladeira íngreme');
 
 let rota = null;
 function mostrarRota() {
@@ -138,70 +145,104 @@ function mostrarRota() {
 function esconderRota() {
   if (rota) { mapa.removeLayer(rota); rota = null; }
 }
-const GUIAS=[
- {id:'o2',t:'Pouco oxigênio',p:['Pare e sente-se para reduzir o consumo','Ative a reserva de emergência','Avise o abrigo mais próximo','Siga a rota segura até o abrigo']},
- {id:'pressao',t:'Perda de pressão',p:['Cubra o ponto de vazamento com o kit de reparo','Confira o manômetro do traje','Abra a válvula de reforço','Volte ao abrigo pela rota segura']},
- {id:'calor',t:'Temperatura alta',p:['Reduza o esforço físico','Ligue o resfriamento do traje','Procure sombra ou abrigo','Hidrate-se e avise a base']},
- {id:'poeira',t:'Tempestade de poeira',p:['Pare e fique de costas para o vento','Proteja o visor e os filtros','Ative a baliza de posição','Espere a visibilidade melhorar ou siga a rota']},
- {id:'comunicacao',t:'Perda de comunicação',p:['Teste o rádio em outro canal','Volte ao último ponto com sinal','Use o mapa offline para se orientar','Ligue a baliza de emergência']}
+
+/* ---------- Dados (PLACEHOLDER: procedimentos inventados, a validar com fontes da NASA) ---------- */
+const GUIAS = [
+  {id:'o2', t:'Pouco oxigênio', p:['Pare e sente-se para reduzir o consumo','Ative a reserva de emergência','Avise o abrigo mais próximo','Siga a rota segura até o abrigo']},
+  {id:'pressao', t:'Perda de pressão', p:['Cubra o ponto de vazamento com o kit de reparo','Confira o manômetro do traje','Abra a válvula de reforço','Volte ao abrigo pela rota segura']},
+  {id:'calor', t:'Temperatura alta', p:['Reduza o esforço físico','Ligue o resfriamento do traje','Procure sombra ou abrigo','Hidrate-se e avise a base']},
+  {id:'poeira', t:'Tempestade de poeira', p:['Pare e fique de costas para o vento','Proteja o visor e os filtros','Ative a baliza de posição','Espere a visibilidade melhorar ou siga a rota']},
+  {id:'comunicacao', t:'Perda de comunicação', p:['Teste o rádio em outro canal','Volte ao último ponto com sinal','Use o mapa offline para se orientar','Ligue a baliza de emergência']}
 ];
-const SENS=[
- {k:'o2',l:'Reserva de O₂',u:'%',min:0,max:100,v:92,bad:v=>v<20,g:'o2',d:'Reserva abaixo do limite seguro.'},
- {k:'pressao',l:'Pressão do traje',u:' kPa',min:10,max:35,v:29,bad:v=>v<24,g:'pressao',d:'O traje está perdendo pressão.'},
- {k:'calor',l:'Temperatura interna',u:' °C',min:10,max:45,v:22,bad:v=>v>30,g:'calor',d:'Temperatura interna acima do limite.'},
- {k:'poeira',l:'Poeira no ar',u:'%',min:0,max:100,v:10,bad:v=>v>70,g:'poeira',d:'Visibilidade caindo rápido.'}
+const SENS = [
+  {k:'o2', l:'Reserva de O₂', u:'%', min:0, max:100, v:92, bad:v=>v<20, g:'o2', d:'Reserva abaixo do limite seguro.'},
+  {k:'pressao', l:'Pressão do traje', u:' kPa', min:10, max:35, v:29, bad:v=>v<24, g:'pressao', d:'O traje está perdendo pressão.'},
+  {k:'calor', l:'Temperatura interna', u:' °C', min:10, max:45, v:22, bad:v=>v>30, g:'calor', d:'Temperatura interna acima do limite.'},
+  {k:'poeira', l:'Poeira no ar', u:'%', min:0, max:100, v:10, bad:v=>v>70, g:'poeira', d:'Visibilidade caindo rápido.'}
 ];
-const $=s=>document.querySelector(s);
-function tab(n){
-  document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===n));
-  ['mapa','guia','traje'].forEach(x=>$('#t-'+x).hidden=x!==n);
+
+/* ---------- Abas ---------- */
+function tab(n) {
+  document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === n));
+  ['mapa','guia','traje'].forEach(x => $('#t-' + x).hidden = x !== n);
+  if (n === 'mapa') mapa.invalidateSize();
 }
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => tab(b.dataset.tab));
 
-$('#guia').innerHTML=GUIAS.map(g=>`<details id="g-${g.id}"><summary>${g.t}</summary><ul class="steps">${g.p.map(s=>`<li><label><input type="checkbox"><span>${s}</span></label></li>`).join('')}</ul></details>`).join('');
+/* ---------- Montagem das telas (dados fixos: innerHTML é seguro aqui; use textContent se vierem de fora) ---------- */
+$('#guia').innerHTML = GUIAS.map(g =>
+  `<details id="g-${g.id}"><summary>${g.t}</summary><ul class="steps">${g.p.map(s =>
+    `<li><label><input type="checkbox"><span>${s}</span></label></li>`).join('')}</ul></details>`
+).join('');
 
-$('#sliders').innerHTML=SENS.map(s=>`<div class="row" id="r-${s.k}"><label for="i-${s.k}">${s.l}<output id="o-${s.k}">${s.v}${s.u}</output></label><input type="range" id="i-${s.k}" min="${s.min}" max="${s.max}" value="${s.v}"></div>`).join('');
+$('#sliders').innerHTML = SENS.map(s =>
+  `<div class="row" id="r-${s.k}"><label for="i-${s.k}">${s.l}<output id="o-${s.k}">${s.v}${s.u}</output></label><input type="range" id="i-${s.k}" min="${s.min}" max="${s.max}" value="${s.v}"></div>`
+).join('');
 
-let atual=null,dispensado={};
-function checar(){
-  let primeiro=null, algum=false;
-  SENS.forEach(s=>{
-    const v=+$('#i-'+s.k).value;
-    $('#o-'+s.k).textContent=v+s.u;
-    const b=s.bad(v);
-    $('#r-'+s.k).classList.toggle('bad',b);
-    if(b){ algum=true; if(!primeiro&&!dispensado[s.k]) primeiro=s; }
-    else dispensado[s.k]=false;
+/* ---------- Alertas ---------- */
+let atual = null, dispensado = {}, ultimoFoco = null;
+
+function checar() {
+  let primeiro = null, algum = false;
+  SENS.forEach(s => {
+    const v = +$('#i-' + s.k).value;
+    $('#o-' + s.k).textContent = v + s.u;
+    const b = s.bad(v);
+    $('#r-' + s.k).classList.toggle('bad', b);
+    if (b) { algum = true; if (!primeiro && !dispensado[s.k]) primeiro = s; }
+    else dispensado[s.k] = false;
   });
-  if(primeiro&&atual!==primeiro) disparar(primeiro);
-  if(!algum){
-    atual=null;
-    $('#banner').className='banner';
-    $('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';
+  if (primeiro && atual !== primeiro) disparar(primeiro);
+  if (!algum) {
+    atual = null;
+    $('#banner').className = 'banner';
+    $('#banner').innerHTML = '<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';
     esconderRota();
   }
 }
-function disparar(s){
-  atual=s;
-  $('#aT').textContent=GUIAS.find(g=>g.id===s.g).t;
-  $('#aD').textContent=s.d;
+
+function disparar(s) {
+  ultimoFoco = document.activeElement;
+  atual = s;
+  const titulo = GUIAS.find(g => g.id === s.g).t;
+  $('#aT').textContent = titulo;
+  $('#aD').textContent = s.d;
   $('#alert').classList.add('show');
   $('#aRota').focus();
-  navigator.vibrate&&navigator.vibrate([250,120,250]);
-  $('#banner').className='banner crit';
-  $('#banner').innerHTML='<b>Alerta: '+GUIAS.find(g=>g.id===s.g).t+'</b><span>Siga a rota até o Abrigo 2 (1,8 km).</span>';
+  navigator.vibrate && navigator.vibrate([250, 120, 250]);
+  $('#banner').className = 'banner crit';
+  $('#banner').innerHTML = '<b>Alerta: ' + titulo + '</b><span>Siga a rota até o Abrigo 2.</span>';
 }
-function fechar(){$('#alert').classList.remove('show');if(atual)dispensado[atual.k]=true;atual=atual&&atual}
-document.querySelectorAll('#sliders input').forEach(i=>i.oninput=checar);
-$('#aRota').onclick=()=>{mostrarRota();fechar();tab('mapa')};
-$('#aGuia').onclick=()=>{const g=atual&&atual.g;fechar();tab('guia');const d=$('#g-'+g);if(d){d.open=true;d.scrollIntoView()}};
-$('#aOk').onclick=fechar;
 
-$('#sat').onclick=e=>{
-  const on=e.currentTarget.getAttribute('aria-pressed')!=='true';
-  e.currentTarget.setAttribute('aria-pressed',on);
-  $('#satTxt').textContent=on?'Satélite':'Offline';
-  $('#offTxt').textContent=on?'Mapa atualizado pelo satélite agora.':'Sem link. Usando o mapa salvo no dispositivo.';
+function fechar() {
+  $('#alert').classList.remove('show');
+  if (atual) dispensado[atual.k] = true;
+  atual = null;
+  if (ultimoFoco) ultimoFoco.focus();
+}
+
+document.querySelectorAll('#sliders input').forEach(i => i.oninput = checar);
+
+$('#aRota').onclick = () => { mostrarRota(); fechar(); tab('mapa'); };
+$('#aGuia').onclick = () => {
+  const g = atual && atual.g;
+  fechar();
+  tab('guia');
+  const d = $('#g-' + g);
+  if (d) { d.open = true; d.scrollIntoView(); }
+};
+$('#aOk').onclick = fechar;
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#alert').classList.contains('show')) fechar();
+});
+
+/* ---------- Satélite (por enquanto só muda o texto) ---------- */
+$('#sat').onclick = e => {
+  const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+  e.currentTarget.setAttribute('aria-pressed', on);
+  $('#satTxt').textContent = on ? 'Satélite' : 'Offline';
+  $('#offTxt').textContent = on ? 'Mapa atualizado pelo satélite agora.' : 'Sem link. Usando o mapa salvo no dispositivo.';
 };
 </script>
 </body>
