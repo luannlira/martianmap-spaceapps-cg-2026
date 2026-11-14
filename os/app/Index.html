@@ -117,30 +117,51 @@ nav button[aria-selected="true"]{color:var(--accent);font-weight:600;border-top-
 /* ---------- Utilidades ---------- */
 const $ = s => document.querySelector(s);
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+/* ---------- Mapa (Leaflet com tiles do Mars Trek, offline) ---------- */
+// Valores impressos por mapa/baixar_tiles.py
+const TILE_EXT = 'jpg';
+const Z_MAX = 8;
+const BOUNDS = [[13, 72], [23, 82]];   // [sul, oeste], [norte, leste]   // [sul, oeste], [norte, leste]
+const CAMADA = 'Mars_Viking_MDIM21_ClrMosaic_global_232m';
 
-/* ---------- Mapa (Leaflet) ---------- */
-// W e H DEVEM ser o tamanho real de assets/terreno.jpg (mudou a imagem? mude aqui também)
-const W = 991, H = 991;
-const limites = [[0, 0], [H, W]];
-const mapa = L.map('map', { crs: L.CRS.Simple, minZoom: -1, maxZoom: 2 });
-L.imageOverlay('assets/terreno.jpg', limites, {
-  attribution: 'Imagem: https://trek.nasa.gov/mars/'
+const mapa = L.map('map', {
+  crs: L.CRS.EPSG4326,                  // projeção equiretangular, a mesma dos tiles do Trek
+  minZoom: Math.max(0, Z_MAX - 4),
+  maxZoom: Z_MAX + 2,
+  maxBounds: L.latLngBounds(BOUNDS).pad(0.5)
+});
+L.tileLayer('assets/tiles/{z}/{y}/{x}.' + TILE_EXT, {
+  tileSize: 256,
+  noWrap: true,
+  maxNativeZoom: Z_MAX,
+  errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+  attribution: 'NASA/JPL Mars Trek · ' + CAMADA
 }).addTo(mapa);
-mapa.fitBounds(limites);
+mapa.fitBounds(BOUNDS);
 
-// MOCK: posições e rota fixas, sem escala (px → metros) definida. Formato [y, x] em pixels da imagem.
+// MOCK: posições e rota inventadas, mas agora em coordenadas reais [lat, lon]
+const VOCE   = [17.8, 77.0];
+const ABRIGO = [18.9, 78.1];
+const ROTA   = [[17.8,77.0],[18.05,77.2],[18.3,77.45],[18.6,77.75],[18.8,77.95],[18.9,78.1]];
+const RISCO  = [[18.0,77.6],[18.0,77.95],[18.3,78.0],[18.3,77.65]];
+
 const COR = { voce: css('--accent'), abrigo: css('--safe'), risco: css('--danger') };
-L.circleMarker([150, 200], { radius: 10, color: COR.voce, fillColor: COR.voce, fillOpacity: 1 }).addTo(mapa).bindTooltip('Você');
-L.circleMarker([830, 760], { radius: 10, color: COR.abrigo, fillColor: COR.abrigo, fillOpacity: 1 }).addTo(mapa).bindTooltip('Abrigo 2');
-L.circle([420, 560], { radius: 130, color: COR.risco }).addTo(mapa).bindTooltip('Ladeira íngreme');
+L.circleMarker(VOCE,   { radius: 10, color: COR.voce,   fillColor: COR.voce,   fillOpacity: 1 }).addTo(mapa).bindTooltip('Você');
+L.circleMarker(ABRIGO, { radius: 10, color: COR.abrigo, fillColor: COR.abrigo, fillOpacity: 1 }).addTo(mapa).bindTooltip('Abrigo 2');
+L.polygon(RISCO,       { color: COR.risco, weight: 2 }).addTo(mapa).bindTooltip('Ladeira íngreme');
+
+// Distância em Marte (raio de 3389,5 km). O Leaflet assume o raio da Terra, então calculamos à mão.
+function distKm(a, b) {
+  const r = Math.PI / 180, dLat = (b[0]-a[0])*r, dLon = (b[1]-a[1])*r;
+  const h = Math.sin(dLat/2)**2 + Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dLon/2)**2;
+  return 2 * 3389.5 * Math.asin(Math.sqrt(h));
+}
+const rotaKm = ROTA.slice(1).reduce((s, p, i) => s + distKm(ROTA[i], p), 0);
 
 let rota = null;
 function mostrarRota() {
   if (rota) return;
-  rota = L.polyline(
-    [[150,200],[300,230],[480,330],[650,420],[780,620],[830,760]],
-    { color: '#ffffff', weight: 5, opacity: 1 }
-  ).addTo(mapa);
+  rota = L.polyline(ROTA, { color: '#ffffff', weight: 5, opacity: 1 }).addTo(mapa);
 }
 function esconderRota() {
   if (rota) { mapa.removeLayer(rota); rota = null; }
@@ -211,7 +232,7 @@ function disparar(s) {
   $('#aRota').focus();
   navigator.vibrate && navigator.vibrate([250, 120, 250]);
   $('#banner').className = 'banner crit';
-  $('#banner').innerHTML = '<b>Alerta: ' + titulo + '</b><span>Siga a rota até o Abrigo 2.</span>';
+  $('#banner').innerHTML = '<b>Alerta: ' + titulo + '</b><span>Siga a rota até o Abrigo 2 (' + rotaKm.toFixed(1) + ' km).</span>'
 }
 
 function fechar() {
