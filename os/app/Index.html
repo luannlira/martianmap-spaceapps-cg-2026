@@ -164,16 +164,22 @@ $('#sliders').innerHTML=SENS.map(s=>`<div class="row" id="r-${s.k}"><label for="
 
 let atual=null,dispensado={};
 function checar(){
-  let crit=null;
+  let primeiro=null, algum=false;
   SENS.forEach(s=>{
     const v=+$('#i-'+s.k).value;
     $('#o-'+s.k).textContent=v+s.u;
     const b=s.bad(v);
     $('#r-'+s.k).classList.toggle('bad',b);
-    if(b&&!crit)crit=s; if(!b)dispensado[s.k]=false;
+    if(b){ algum=true; if(!primeiro&&!dispensado[s.k]) primeiro=s; }
+    else dispensado[s.k]=false;
   });
-  if(crit&&!dispensado[crit.k]&&atual!==crit)disparar(crit);
-  if(!crit){atual=null;$('#banner').className='banner';$('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';if(!crit){atual=null;$('#banner').className='banner';$('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';esconderRota()}}
+  if(primeiro&&atual!==primeiro) disparar(primeiro);
+  if(!algum){
+    atual=null;
+    $('#banner').className='banner';
+    $('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';
+    esconderRota();
+  }
 }
 function disparar(s){
   atual=s;
