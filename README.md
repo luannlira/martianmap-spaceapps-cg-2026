@@ -1,4 +1,4 @@
-# Martian Map — Survival OS *(nome provisório)*
+# Martian Map — Survival OS *(Segunda chance de Sobreviver)*
 
 > NASA Space Apps Challenge 2026 · Campina Grande
 > **Desafio:** Interplanetary Survival Guide: Martian Map
@@ -30,7 +30,7 @@ Um **sistema operacional (distro) leve**, pensado como uma **segunda via de sobr
 - [ ] Bateria de longa duração
 - [ ] Alertar rapidamente em situações críticas
 
-## Escopo do protótipo *(a definir pela equipe)*
+## Escopo do protótipo *(SO de um novo Dispositivo Portátil)*
 
 > O que vamos realmente entregar no hackathon? Preencher e ajustar ao longo do evento.
 
