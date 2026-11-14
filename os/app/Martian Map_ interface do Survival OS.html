@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Martian Map — Survival OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0d1325;--panel:#17203a;--line:#2b3658;--text:#f1e6d2;--mute:#a3abc6;--dust:#e8a56a;--safe:#6fe3c8;--danger:#ff5a36;--ondanger:#1a0600;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;--bg:#f3ecdf;--panel:#fff8ec;--line:#d9cbb2;--text:#1b2038;--mute:#5d6483;--dust:#b4531f;--safe:#0b7a67;--danger:#c8300f;--ondanger:#fff}}
+:root[data-theme="dark"]{color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 18px/1.4 Barlow,system-ui,sans-serif;display:flex;justify-content:center}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--dust);outline-offset:2px}
+.dev{width:100%;max-width:440px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;border-inline:1px solid var(--line)}
+h1,h2,h3{font-family:"Barlow Condensed",Barlow,sans-serif;margin:0;line-height:1.05}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+header h1{font-size:28px;letter-spacing:.01em}
+.status{display:flex;gap:8px;align-items:center}
+.sat{min-height:48px;padding:0 14px;border-radius:24px;border:2px solid var(--safe);background:transparent;font-weight:600;display:flex;align-items:center;gap:8px}
+.sat i{width:12px;height:12px;border-radius:50%;background:var(--safe)}
+.sat[aria-pressed="false"]{border-color:var(--mute);color:var(--mute)}
+.sat[aria-pressed="false"] i{background:var(--mute)}
+.bat{font-weight:600;color:var(--mute);font-variant-numeric:tabular-nums}
+main{flex:1;padding:16px;overflow:auto}
+section[hidden]{display:none}
+.banner{padding:14px 16px;border-radius:14px;background:var(--panel);border-left:8px solid var(--safe);margin-bottom:14px}
+.banner b{font:700 24px/1.1 "Barlow Condensed",sans-serif;display:block}
+.banner span{color:var(--mute)}
+.banner.crit{border-left-color:var(--danger)}
+.map{width:100%;height:auto;display:block;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.map .c{fill:none;stroke:var(--line);stroke-width:2}
+.map .haz{fill:var(--danger);opacity:.22;stroke:var(--danger);stroke-width:2;stroke-dasharray:6 5}
+.map .route{fill:none;stroke:var(--safe);stroke-width:6;stroke-linecap:round;stroke-dasharray:2 12;display:none}
+.map.on .route{display:block}
+.map text{fill:var(--text);font:600 15px Barlow,sans-serif}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 0;color:var(--mute);font-size:16px}
+.legend b{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+summary{list-style:none;min-height:64px;padding:14px 16px;font:700 24px "Barlow Condensed",sans-serif;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:30px;color:var(--dust)}
+details[open] summary::after{content:"–"}
+.steps{padding:0 16px 14px;margin:0;list-style:none}
+.steps label{display:flex;gap:14px;align-items:flex-start;min-height:56px;padding:10px 0;border-top:1px solid var(--line)}
+.steps input{width:28px;height:28px;flex:none;accent-color:var(--safe);margin-top:2px}
+.steps input:checked+span{color:var(--mute);text-decoration:line-through}
+.sim{background:var(--panel);border:1px dashed var(--mute);border-radius:14px;padding:14px 16px}
+.sim p{margin:0 0 6px;color:var(--mute);font-size:16px}
+.row{padding:10px 0;border-top:1px solid var(--line)}
+.row label{display:flex;justify-content:space-between;font-weight:600}
+.row output{font-variant-numeric:tabular-nums;color:var(--dust)}
+.row.bad output{color:var(--danger)}
+.row input{width:100%;height:44px;accent-color:var(--dust)}
+nav{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);background:var(--panel)}
+nav button{min-height:72px;border:0;background:transparent;font:700 22px "Barlow Condensed",sans-serif;color:var(--mute);border-top:4px solid transparent}
+nav button[aria-selected="true"]{color:var(--text);border-top-color:var(--dust)}
+.alert{position:fixed;inset:0;z-index:20;background:var(--danger);color:var(--ondanger);display:none;flex-direction:column;justify-content:center;gap:18px;padding:max(24px,env(safe-area-inset-top,0px)) 24px max(24px,env(safe-area-inset-bottom,0px))}
+.alert.show{display:flex}
+.alert h2{font-size:clamp(44px,14vw,72px)}
+.alert p{font-size:22px;margin:0}
+.alert button{min-height:72px;border-radius:16px;border:3px solid var(--ondanger);background:var(--ondanger);color:var(--danger);font:700 26px "Barlow Condensed",sans-serif}
+.alert button.alt{background:transparent;color:var(--ondanger)}
+.alert.show h2{animation:pulse 1s 2}
+@keyframes pulse{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.alert.show h2{animation:none}}
+</style>
+</head>
+<body>
+<div class="dev">
+<header>
+  <h1>Martian Map</h1>
+  <div class="status">
+    <button class="sat" id="sat" aria-pressed="true"><i></i><span id="satTxt">Satélite</span></button>
+    <span class="bat" aria-label="Bateria">94%</span>
+  </div>
+</header>
+
+<main>
+  <section id="t-mapa" aria-label="Mapa">
+    <div class="banner" id="banner"><b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span></div>
+    <svg class="map" id="map" viewBox="0 0 360 400" role="img" aria-label="Mapa estilizado da área com explorador, abrigo e zona de risco">
+      <path class="c" d="M-10 90 C70 60 140 120 220 80 S340 60 380 90"/>
+      <path class="c" d="M-10 160 C60 130 130 190 210 150 S330 130 380 165"/>
+      <path class="c" d="M-10 240 C80 210 150 270 230 230 S330 210 380 245"/>
+      <path class="c" d="M-10 320 C70 290 150 350 240 310 S330 295 380 320"/>
+      <ellipse class="haz" cx="190" cy="210" rx="78" ry="46"/>
+      <text x="150" y="214">Ladeira íngreme</text>
+      <path class="route" d="M70 340 C60 270 110 270 118 215 S150 130 230 140 S290 120 292 78"/>
+      <circle cx="70" cy="340" r="11" fill="var(--dust)"/>
+      <text x="88" y="346">Você</text>
+      <rect x="280" y="66" width="26" height="26" rx="5" fill="var(--safe)"/>
+      <text x="236" y="58">Abrigo 2 · 1,8 km</text>
+    </svg>
+    <p class="legend"><span><b style="background:var(--dust)"></b>Você</span><span><b style="background:var(--safe)"></b>Abrigo</span><span><b style="background:var(--danger)"></b>Risco</span></p>
+    <p class="legend" id="offTxt" style="margin-top:6px">Mapa atualizado pelo satélite agora.</p>
+  </section>
+
+  <section id="t-guia" aria-label="Guia" hidden>
+    <div id="guia"></div>
+  </section>
+
+  <section id="t-traje" aria-label="Traje" hidden>
+    <div class="sim">
+      <p>Valores simulados do traje. Mova os controles para testar um alerta.</p>
+      <div id="sliders"></div>
+    </div>
+  </section>
+</main>
+
+<nav role="tablist" aria-label="Seções">
+  <button role="tab" data-tab="mapa" aria-selected="true">Mapa</button>
+  <button role="tab" data-tab="guia" aria-selected="false">Guia</button>
+  <button role="tab" data-tab="traje" aria-selected="false">Traje</button>
+</nav>
+</div>
+
+<div class="alert" id="alert" role="alertdialog" aria-labelledby="aT" aria-live="assertive">
+  <h2 id="aT">Oxigênio baixo</h2>
+  <p id="aD">Reserva abaixo do limite seguro.</p>
+  <button id="aRota">Ver rota até o abrigo</button>
+  <button class="alt" id="aGuia">Abrir checklist</button>
+  <button class="alt" id="aOk">Dispensar</button>
+</div>
+
+<script>
+const GUIAS=[
+ {id:'o2',t:'Pouco oxigênio',p:['Pare e sente-se para reduzir o consumo','Ative a reserva de emergência','Avise o abrigo mais próximo','Siga a rota segura até o abrigo']},
+ {id:'pressao',t:'Perda de pressão',p:['Cubra o ponto de vazamento com o kit de reparo','Confira o manômetro do traje','Abra a válvula de reforço','Volte ao abrigo pela rota segura']},
+ {id:'calor',t:'Temperatura alta',p:['Reduza o esforço físico','Ligue o resfriamento do traje','Procure sombra ou abrigo','Hidrate-se e avise a base']},
+ {id:'poeira',t:'Tempestade de poeira',p:['Pare e fique de costas para o vento','Proteja o visor e os filtros','Ative a baliza de posição','Espere a visibilidade melhorar ou siga a rota']},
+ {id:'comunicacao',t:'Perda de comunicação',p:['Teste o rádio em outro canal','Volte ao último ponto com sinal','Use o mapa offline para se orientar','Ligue a baliza de emergência']}
+];
+const SENS=[
+ {k:'o2',l:'Reserva de O₂',u:'%',min:0,max:100,v:92,bad:v=>v<20,g:'o2',d:'Reserva abaixo do limite seguro.'},
+ {k:'pressao',l:'Pressão do traje',u:' kPa',min:10,max:35,v:29,bad:v=>v<24,g:'pressao',d:'O traje está perdendo pressão.'},
+ {k:'calor',l:'Temperatura interna',u:' °C',min:10,max:45,v:22,bad:v=>v>30,g:'calor',d:'Temperatura interna acima do limite.'},
+ {k:'poeira',l:'Poeira no ar',u:'%',min:0,max:100,v:10,bad:v=>v>70,g:'poeira',d:'Visibilidade caindo rápido.'}
+];
+const $=s=>document.querySelector(s);
+function tab(n){
+  document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===n));
+  ['mapa','guia','traje'].forEach(x=>$('#t-'+x).hidden=x!==n);
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+
+$('#guia').innerHTML=GUIAS.map(g=>`<details id="g-${g.id}"><summary>${g.t}</summary><ul class="steps">${g.p.map(s=>`<li><label><input type="checkbox"><span>${s}</span></label></li>`).join('')}</ul></details>`).join('');
+
+$('#sliders').innerHTML=SENS.map(s=>`<div class="row" id="r-${s.k}"><label for="i-${s.k}">${s.l}<output id="o-${s.k}">${s.v}${s.u}</output></label><input type="range" id="i-${s.k}" min="${s.min}" max="${s.max}" value="${s.v}"></div>`).join('');
+
+let atual=null,dispensado={};
+function checar(){
+  let crit=null;
+  SENS.forEach(s=>{
+    const v=+$('#i-'+s.k).value;
+    $('#o-'+s.k).textContent=v+s.u;
+    const b=s.bad(v);
+    $('#r-'+s.k).classList.toggle('bad',b);
+    if(b&&!crit)crit=s; if(!b)dispensado[s.k]=false;
+  });
+  if(crit&&!dispensado[crit.k]&&atual!==crit)disparar(crit);
+  if(!crit){atual=null;$('#banner').className='banner';$('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';$('#map').classList.remove('on')}
+}
+function disparar(s){
+  atual=s;
+  $('#aT').textContent=GUIAS.find(g=>g.id===s.g).t;
+  $('#aD').textContent=s.d;
+  $('#alert').classList.add('show');
+  $('#aRota').focus();
+  navigator.vibrate&&navigator.vibrate([250,120,250]);
+  $('#banner').className='banner crit';
+  $('#banner').innerHTML='<b>Alerta: '+GUIAS.find(g=>g.id===s.g).t+'</b><span>Siga a rota até o Abrigo 2 (1,8 km).</span>';
+}
+function fechar(){$('#alert').classList.remove('show');if(atual)dispensado[atual.k]=true;atual=atual&&atual}
+document.querySelectorAll('#sliders input').forEach(i=>i.oninput=checar);
+$('#aRota').onclick=()=>{$('#map').classList.add('on');fechar();tab('mapa')};
+$('#aGuia').onclick=()=>{const g=atual&&atual.g;fechar();tab('guia');const d=$('#g-'+g);if(d){d.open=true;d.scrollIntoView()}};
+$('#aOk').onclick=fechar;
+
+$('#sat').onclick=e=>{
+  const on=e.currentTarget.getAttribute('aria-pressed')!=='true';
+  e.currentTarget.setAttribute('aria-pressed',on);
+  $('#satTxt').textContent=on?'Satélite':'Offline';
+  $('#offTxt').textContent=on?'Mapa atualizado pelo satélite agora.':'Sem link. Usando o mapa salvo no dispositivo.';
+};
+</script>
+</body>
+</html>
