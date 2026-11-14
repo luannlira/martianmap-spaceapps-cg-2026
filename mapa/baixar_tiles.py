@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """
 Baixa tiles do Mars Trek (NASA/JPL) de uma região pequena, para uso offline no app.
-
-Uso (a partir da raiz do repositório):
-    python mapa/baixar_tiles.py --contar     # só conta quantos tiles e estima o tamanho (não baixa)
-    python mapa/baixar_tiles.py              # baixa de verdade
-
-Os tiles vão para  os/app/assets/tiles/{z}/{y}/{x}.{ext}
-No fim, o script imprime as constantes para colar no app.js e grava lista.json
-(lista de arquivos, útil para o service worker do PWA).
-
-Sem dependências externas (só a biblioteca padrão do Python 3).
 """
 import argparse
 import json
