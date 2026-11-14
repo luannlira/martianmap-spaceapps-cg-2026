@@ -14,13 +14,13 @@ Um **sistema operacional (distro) leve**, pensado como uma **segunda via de sobr
 
 ## Módulos
 
-| Módulo | O que é | Pasta | Origem |
-|--------|---------|-------|--------|
-| S.O. / distro | Sistema leve, simples de usar, que roda no dispositivo | [`os/`](os) | Ideia do Euler |
-| Guia de sobrevivência | Conteúdo offline: procedimentos, emergências, checklists | [`guia-sobrevivencia/`](guia-sobrevivencia) | — |
-| Mapa e navegação | Mapeamento da área e locais seguros via satélites | [`mapa/`](mapa) | — |
-| Traje inteligente | Detecção de situações críticas e alertas | [`traje/`](traje) | Sugestão do João |
-| Hardware e energia | Dispositivo, formato, bateria, requisitos | [`hardware/`](hardware) | — |
+| Módulo | O que é | Pasta | 
+|--------|---------|-------|
+| S.O. / distro | Sistema leve, simples de usar, que roda no dispositivo | [`os/`](os) |
+| Guia de sobrevivência | Conteúdo offline: procedimentos, emergências, checklists | [`guia-sobrevivencia/`](guia-sobrevivencia) |
+| Mapa e navegação | Mapeamento da área e locais seguros via satélites | [`mapa/`](mapa) | 
+| Traje inteligente | Detecção de situações críticas e alertas | [`traje/`](traje) | 
+| Hardware e energia | Dispositivo, formato, bateria, requisitos | [`hardware/`](hardware) |
 
 ## Requisitos (metas)
 
@@ -30,12 +30,12 @@ Um **sistema operacional (distro) leve**, pensado como uma **segunda via de sobr
 - [ ] Bateria de longa duração
 - [ ] Alertar rapidamente em situações críticas
 
-## Escopo do protótipo *(SO de um novo Dispositivo Portátil)*
+## Escopo do protótipo *(a definir pela equipe)*
 
-> O que vamos realmente entregar no hackathon? Preencher e ajustar ao longo do evento.
+> O que vamos entregar no hackathon: uma demonstração de como o Survival OS funciona, em formato de app web instalável.
 
-- [ ] (a definir)
-- [ ] (a definir)
+- [ ] **Site/app que simula a interface do S.O.**: telas de Mapa, Guia e Traje, pensadas para uso com luvas e em um dispositivo pequeno
+- [ ] **PWA com funcionamento offline**: guia de sobrevivência e mapa salvos no dispositivo, com alternância entre satélite e offline
 - [ ] (a definir)
 
 ## Dados utilizados
@@ -48,7 +48,7 @@ Um **sistema operacional (distro) leve**, pensado como uma **segunda via de sobr
 *(a preencher)*
 
 ```bash
-git clone https://github.com/SEU_USUARIO/martian-map-spaceapps-cg-2026.git
+git clone https://github.com/luannlira/martianmap-spaceapps-cg-2026.git
 cd martian-map-spaceapps-cg-2026
 ```
 
