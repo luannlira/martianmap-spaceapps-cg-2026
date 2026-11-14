@@ -1,73 +1,71 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<link rel="stylesheet" href="vendor/leaflet.css">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Martian Map — Survival OS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#0d1325;--panel:#17203a;--line:#2b3658;--text:#f1e6d2;--mute:#a3abc6;--dust:#e8a56a;--safe:#6fe3c8;--danger:#ff5a36;--ondanger:#1a0600;
+:root{color-scheme:light dark;
+--bg:#f3f3f3;--panel:#ffffff;--line:#d1d1d1;--text:#1b1b1b;--mute:#5f5f5f;
+--accent:#0067c0;--onaccent:#ffffff;--dust:var(--accent);
+--safe:#0f7b0f;--danger:#c42b1c;--hover:#e9e9e9;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;--bg:#f3ecdf;--panel:#fff8ec;--line:#d9cbb2;--text:#1b2038;--mute:#5d6483;--dust:#b4531f;--safe:#0b7a67;--danger:#c8300f;--ondanger:#fff}}
-:root[data-theme="dark"]{color-scheme:dark}
+@media (prefers-color-scheme:dark){:root{
+--bg:#202020;--panel:#2b2b2b;--line:#454545;--text:#ffffff;--mute:#c5c5c5;
+--accent:#4cc2ff;--onaccent:#000000;--safe:#6ccb5f;--danger:#ff6b6b;--hover:#3a3a3a}}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:400 18px/1.4 Barlow,system-ui,sans-serif;display:flex;justify-content:center}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.4 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;display:flex;justify-content:center}
 button{font:inherit;color:inherit;cursor:pointer}
-:focus-visible{outline:3px solid var(--dust);outline-offset:2px}
-.dev{width:100%;max-width:440px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;border-inline:1px solid var(--line)}
-h1,h2,h3{font-family:"Barlow Condensed",Barlow,sans-serif;margin:0;line-height:1.05}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
-header h1{font-size:28px;letter-spacing:.01em}
-.status{display:flex;gap:8px;align-items:center}
-.sat{min-height:48px;padding:0 14px;border-radius:24px;border:2px solid var(--safe);background:transparent;font-weight:600;display:flex;align-items:center;gap:8px}
-.sat i{width:12px;height:12px;border-radius:50%;background:var(--safe)}
-.sat[aria-pressed="false"]{border-color:var(--mute);color:var(--mute)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dev{width:100%;max-width:440px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;border-inline:1px solid var(--line);background:var(--bg)}
+h1,h2,h3{margin:0;font-weight:600;line-height:1.2}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{font-size:16px}
+.status{display:flex;gap:12px;align-items:center}
+.sat{min-height:44px;padding:0 12px;border-radius:4px;border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:8px}
+.sat:hover{background:var(--hover)}
+.sat i{width:10px;height:10px;border-radius:50%;background:var(--safe)}
 .sat[aria-pressed="false"] i{background:var(--mute)}
-.bat{font-weight:600;color:var(--mute);font-variant-numeric:tabular-nums}
+.bat{color:var(--mute);font-variant-numeric:tabular-nums}
 main{flex:1;padding:16px;overflow:auto}
 section[hidden]{display:none}
-.banner{padding:14px 16px;border-radius:14px;background:var(--panel);border-left:8px solid var(--safe);margin-bottom:14px}
-.banner b{font:700 24px/1.1 "Barlow Condensed",sans-serif;display:block}
+.banner{padding:12px 14px;border:1px solid var(--line);border-left:4px solid var(--safe);border-radius:4px;background:var(--panel);margin-bottom:12px}
+.banner b{display:block;font-size:16px;font-weight:600}
 .banner span{color:var(--mute)}
 .banner.crit{border-left-color:var(--danger)}
-.map{width:100%;height:auto;display:block;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
-.map .c{fill:none;stroke:var(--line);stroke-width:2}
-.map .haz{fill:var(--danger);opacity:.22;stroke:var(--danger);stroke-width:2;stroke-dasharray:6 5}
-.map .route{fill:none;stroke:var(--safe);stroke-width:6;stroke-linecap:round;stroke-dasharray:2 12;display:none}
-.map.on .route{display:block}
-.map text{fill:var(--text);font:600 15px Barlow,sans-serif}
-.legend{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 0;color:var(--mute);font-size:16px}
-.legend b{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-details{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
-summary{list-style:none;min-height:64px;padding:14px 16px;font:700 24px "Barlow Condensed",sans-serif;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.map{height:400px;border-radius:4px;border:1px solid var(--line);background:var(--panel)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0;color:var(--mute);font-size:14px}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:4px;margin-bottom:8px}
+summary{list-style:none;min-height:48px;padding:10px 14px;font-weight:600;font-size:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+summary:hover{background:var(--hover)}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"+";font-size:30px;color:var(--dust)}
+summary::after{content:"+";font-size:20px;color:var(--mute)}
 details[open] summary::after{content:"–"}
-.steps{padding:0 16px 14px;margin:0;list-style:none}
-.steps label{display:flex;gap:14px;align-items:flex-start;min-height:56px;padding:10px 0;border-top:1px solid var(--line)}
-.steps input{width:28px;height:28px;flex:none;accent-color:var(--safe);margin-top:2px}
+.steps{padding:0 14px 8px;margin:0;list-style:none}
+.steps label{display:flex;gap:12px;align-items:flex-start;min-height:48px;padding:10px 0;border-top:1px solid var(--line)}
+.steps input{width:20px;height:20px;flex:none;accent-color:var(--accent);margin-top:2px}
 .steps input:checked+span{color:var(--mute);text-decoration:line-through}
-.sim{background:var(--panel);border:1px dashed var(--mute);border-radius:14px;padding:14px 16px}
-.sim p{margin:0 0 6px;color:var(--mute);font-size:16px}
-.row{padding:10px 0;border-top:1px solid var(--line)}
-.row label{display:flex;justify-content:space-between;font-weight:600}
-.row output{font-variant-numeric:tabular-nums;color:var(--dust)}
-.row.bad output{color:var(--danger)}
-.row input{width:100%;height:44px;accent-color:var(--dust)}
+.sim{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px 14px}
+.sim p{margin:0 0 6px;color:var(--mute);font-size:14px}
+.row{padding:8px 0;border-top:1px solid var(--line)}
+.row label{display:flex;justify-content:space-between}
+.row output{font-variant-numeric:tabular-nums;color:var(--mute)}
+.row.bad output{color:var(--danger);font-weight:600}
+.row input{width:100%;height:36px;accent-color:var(--accent)}
 nav{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);background:var(--panel)}
-nav button{min-height:72px;border:0;background:transparent;font:700 22px "Barlow Condensed",sans-serif;color:var(--mute);border-top:4px solid transparent}
-nav button[aria-selected="true"]{color:var(--text);border-top-color:var(--dust)}
-.alert{position:fixed;inset:0;z-index:20;background:var(--danger);color:var(--ondanger);display:none;flex-direction:column;justify-content:center;gap:18px;padding:max(24px,env(safe-area-inset-top,0px)) 24px max(24px,env(safe-area-inset-bottom,0px))}
+nav button{min-height:52px;border:0;background:transparent;font-size:15px;color:var(--mute);border-top:3px solid transparent}
+nav button:hover{background:var(--hover)}
+nav button[aria-selected="true"]{color:var(--accent);font-weight:600;border-top-color:var(--accent)}
+.alert{position:fixed;z-index:20;top:50%;left:50%;transform:translate(-50%,-50%);width:min(420px,calc(100vw - 32px));display:none;flex-direction:column;gap:12px;padding:20px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-top:6px solid var(--danger);border-radius:6px;box-shadow:0 0 0 100vmax rgba(0,0,0,.45),0 8px 32px rgba(0,0,0,.35)}
 .alert.show{display:flex}
-.alert h2{font-size:clamp(44px,14vw,72px)}
-.alert p{font-size:22px;margin:0}
-.alert button{min-height:72px;border-radius:16px;border:3px solid var(--ondanger);background:var(--ondanger);color:var(--danger);font:700 26px "Barlow Condensed",sans-serif}
-.alert button.alt{background:transparent;color:var(--ondanger)}
-.alert.show h2{animation:pulse 1s 2}
-@keyframes pulse{50%{opacity:.45}}
-@media (prefers-reduced-motion:reduce){.alert.show h2{animation:none}}
+.alert h2{font-size:20px;color:var(--danger)}
+.alert p{margin:0}
+.alert button{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:4px;background:var(--hover);font-weight:600}
+.alert button:hover{border-color:var(--mute)}
+.alert #aRota{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
 </style>
 </head>
 <body>
@@ -83,19 +81,7 @@ nav button[aria-selected="true"]{color:var(--text);border-top-color:var(--dust)}
 <main>
   <section id="t-mapa" aria-label="Mapa">
     <div class="banner" id="banner"><b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span></div>
-    <svg class="map" id="map" viewBox="0 0 360 400" role="img" aria-label="Mapa estilizado da área com explorador, abrigo e zona de risco">
-      <path class="c" d="M-10 90 C70 60 140 120 220 80 S340 60 380 90"/>
-      <path class="c" d="M-10 160 C60 130 130 190 210 150 S330 130 380 165"/>
-      <path class="c" d="M-10 240 C80 210 150 270 230 230 S330 210 380 245"/>
-      <path class="c" d="M-10 320 C70 290 150 350 240 310 S330 295 380 320"/>
-      <ellipse class="haz" cx="190" cy="210" rx="78" ry="46"/>
-      <text x="150" y="214">Ladeira íngreme</text>
-      <path class="route" d="M70 340 C60 270 110 270 118 215 S150 130 230 140 S290 120 292 78"/>
-      <circle cx="70" cy="340" r="11" fill="var(--dust)"/>
-      <text x="88" y="346">Você</text>
-      <rect x="280" y="66" width="26" height="26" rx="5" fill="var(--safe)"/>
-      <text x="236" y="58">Abrigo 2 · 1,8 km</text>
-    </svg>
+    <div id="map" class="map" role="img" aria-label="Mapa da área com você, o abrigo e a zona de risco"></div>
     <p class="legend"><span><b style="background:var(--dust)"></b>Você</span><span><b style="background:var(--safe)"></b>Abrigo</span><span><b style="background:var(--danger)"></b>Risco</span></p>
     <p class="legend" id="offTxt" style="margin-top:6px">Mapa atualizado pelo satélite agora.</p>
   </section>
@@ -126,8 +112,32 @@ nav button[aria-selected="true"]{color:var(--text);border-top-color:var(--dust)}
   <button class="alt" id="aGuia">Abrir checklist</button>
   <button class="alt" id="aOk">Dispensar</button>
 </div>
-
+<script src="vendor/leaflet.js"></script> 
 <script>
+const W = 991, H = 991;               // tamanho da imagem do terreno, em pixels
+const limites = [[0, 0], [H, W]];
+const mapa = L.map('map', { crs: L.CRS.Simple, minZoom: -1, maxZoom: 2 });
+L.imageOverlay('../../data/samples/terreno.jpg', limites, {
+  attribution: 'Imagem: https://trek.nasa.gov/mars/'
+}).addTo(mapa);
+mapa.fitBounds(limites);
+
+// Posições no formato [y, x], em pixels da imagem
+L.circleMarker([150, 200], { radius: 10, color: '#e8a56a', fillOpacity: 1 }).addTo(mapa).bindTooltip('Você');
+L.circleMarker([830, 760], { radius: 10, color: '#6fe3c8', fillOpacity: 1 }).addTo(mapa).bindTooltip('Abrigo 2');
+L.circle([420, 560], { radius: 130, color: '#ff5a36' }).addTo(mapa).bindTooltip('Ladeira íngreme');
+
+let rota = null;
+function mostrarRota() {
+  if (rota) return;
+  rota = L.polyline(
+    [[150,200],[300,230],[480,330],[650,420],[780,620],[830,760]],
+    { color: '#ffffff', weight: 5, opacity: 1 }
+  ).addTo(mapa);
+}
+function esconderRota() {
+  if (rota) { mapa.removeLayer(rota); rota = null; }
+}
 const GUIAS=[
  {id:'o2',t:'Pouco oxigênio',p:['Pare e sente-se para reduzir o consumo','Ative a reserva de emergência','Avise o abrigo mais próximo','Siga a rota segura até o abrigo']},
  {id:'pressao',t:'Perda de pressão',p:['Cubra o ponto de vazamento com o kit de reparo','Confira o manômetro do traje','Abra a válvula de reforço','Volte ao abrigo pela rota segura']},
@@ -163,7 +173,7 @@ function checar(){
     if(b&&!crit)crit=s; if(!b)dispensado[s.k]=false;
   });
   if(crit&&!dispensado[crit.k]&&atual!==crit)disparar(crit);
-  if(!crit){atual=null;$('#banner').className='banner';$('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';$('#map').classList.remove('on')}
+  if(!crit){atual=null;$('#banner').className='banner';$('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';if(!crit){atual=null;$('#banner').className='banner';$('#banner').innerHTML='<b>Tudo normal</b><span>Nenhuma situação crítica detectada.</span>';esconderRota()}}
 }
 function disparar(s){
   atual=s;
@@ -177,7 +187,7 @@ function disparar(s){
 }
 function fechar(){$('#alert').classList.remove('show');if(atual)dispensado[atual.k]=true;atual=atual&&atual}
 document.querySelectorAll('#sliders input').forEach(i=>i.oninput=checar);
-$('#aRota').onclick=()=>{$('#map').classList.add('on');fechar();tab('mapa')};
+$('#aRota').onclick=()=>{mostrarRota();fechar();tab('mapa')};
 $('#aGuia').onclick=()=>{const g=atual&&atual.g;fechar();tab('guia');const d=$('#g-'+g);if(d){d.open=true;d.scrollIntoView()}};
 $('#aOk').onclick=fechar;
 
