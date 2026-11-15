@@ -1,0 +1,17 @@
+{
+  "name": "Martian Map — Survival OS",
+  "short_name": "Martian Map",
+  "description": "Segunda via de sobrevivência em Marte: mapa, guia e alertas do traje, funcionando offline.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#202020",
+  "theme_color": "#202020",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

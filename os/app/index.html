@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>: <meta charset="utf-8">
-<link rel="stylesheet" href="vendor/leaflet.css">
+<head>
 <meta charset="utf-8">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#202020">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Martian Map — Survival OS</title>
 <style>
@@ -120,8 +124,8 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 /* ---------- Mapa (Leaflet com tiles do Mars Trek, offline) ---------- */
 // Valores impressos por mapa/baixar_tiles.py
 const TILE_EXT = 'jpg';
-const Z_MAX = 8;
-const BOUNDS = [[13, 72], [23, 82]];   // [sul, oeste], [norte, leste]   // [sul, oeste], [norte, leste]
+const Z_MAX = 7;   // o Trek só tem tiles até o zoom 7 nessa camada (zoom 8 dá 404)
+const BOUNDS = [[13, 72], [23, 82]];   // [sul, oeste], [norte, leste]
 const CAMADA = 'Mars_Viking_MDIM21_ClrMosaic_global_232m';
 
 const mapa = L.map('map', {
@@ -258,13 +262,23 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && $('#alert').classList.contains('show')) fechar();
 });
 
-/* ---------- Satélite (por enquanto só muda o texto) ---------- */
-$('#sat').onclick = e => {
-  const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
-  e.currentTarget.setAttribute('aria-pressed', on);
+/* ---------- Satélite / offline ---------- */
+// O botão continua servindo para simular o link; além disso, o app reage à rede de verdade
+// (modo avião, DevTools > Network > Offline) porque mapa e guia já estão salvos no dispositivo.
+function setSat(on) {
+  $('#sat').setAttribute('aria-pressed', on);
   $('#satTxt').textContent = on ? 'Satélite' : 'Offline';
   $('#offTxt').textContent = on ? 'Mapa atualizado pelo satélite agora.' : 'Sem link. Usando o mapa salvo no dispositivo.';
-};
+}
+$('#sat').onclick = e => setSat(e.currentTarget.getAttribute('aria-pressed') !== 'true');
+window.addEventListener('offline', () => setSat(false));
+window.addEventListener('online',  () => setSat(true));
+if (!navigator.onLine) setSat(false);
+
+/* ---------- PWA: service worker (cache do app, do mapa e do guia) ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW:', err)));
+}
 </script>
 </body>
 </html>

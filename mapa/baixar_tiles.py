@@ -19,7 +19,7 @@ CAMADA = "Mars_Viking_MDIM21_ClrMosaic_global_232m"
 SUL, OESTE, NORTE, LESTE = 13, 72, 23, 82
 
 # Zoom máximo a baixar (o máximo real depende da camada; tiles que não existem são ignorados).
-ZOOM_MAX = 8
+ZOOM_MAX = 7   # nessa camada o Trek não tem zoom 8 (404)
 # ------------------------------------------------------------------
 
 URL = ("https://trek.nasa.gov/tiles/Mars/EQ/{camada}/1.0.0/default/default028mm/"
