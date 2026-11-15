@@ -71,7 +71,7 @@ cd martian-map-spaceapps-cg-2026
 ## Equipe
 | Nome | GitHub |
 |------|--------|
-| Euler| [@Eulxrs](https://github.com/Eulxrs) 
+| Euler| [@Eulxrs](https://github.com/Eulxrs)|
 | João | [@JoaoBatistaAlm](https://github.com/JoaoBatistaAlm)| 
 | Luann| [@luannlira](https://github.com/luannlira) | 
 | Kauã | [@KauaFerreira-dev-eng](https://github.com/KauaFerreira-dev-eng) |
