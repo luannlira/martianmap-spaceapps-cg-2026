@@ -7,7 +7,7 @@ Roteiro completo, com tempos. Cerca de 400 palavras, aproximadamente 2min50 em r
 
 ## 1. Abertura e desafio (0:00 – 0:15)
 
-Boa tarde! Somos a equipe Jekll, formada pelas iniciais de João, Euler, Kauã, Luann e Lucas, de Campina Grande. Escolhemos o desafio Interplanetary Survival Guide: Martian Map.
+Boa tarde! Somos a equipe JEKLL, formada pelas iniciais de João, Euler, Kauã, Luann e Lucas, de Campina Grande. Escolhemos o desafio Interplanetary Survival Guide: Martian Map.
 
 ## 2. Problema (0:15 – 0:50)
 
