@@ -159,7 +159,9 @@ HTML, CSS e JavaScript puro (sem framework) · [Leaflet](https://leafletjs.com) 
 
 - [Visão geral](docs/visao-geral.md): problema, solução, para quem e diferencial
 - [Arquitetura](docs/arquitetura.md): como os módulos se conectam, fluxo de alerta e estratégia offline
+- [Modo Perdido](docs/modo-perdido.md): o recurso central (planejado, ainda não implementado)
 - [Pitch](docs/pitch.md): roteiro, demo e perguntas prováveis
+- [Uso de IA](docs/uso-de-ia.md): declaração de uso de IA
 
 ## Créditos
 
