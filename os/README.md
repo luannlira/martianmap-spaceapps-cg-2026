@@ -1,62 +1,62 @@
-# S.O. / distro
+# OS / distro
 
-Sistema operacional leve de sobrevivência: simples de manipular, funcional offline, pensado para dispositivo pequeno. *Ideia: Euler.*
+Lightweight survival operating system: simple to handle, works offline, designed for a small device. *Idea: Euler.*
 
 ## Status
 
-- [x] **Protótipo:** app web instalável (PWA) que simula a interface do Survival OS ([`app/`](app))
-- [ ] **Distro dedicada:** é visão de produto, não existe ainda
-- [ ] [Modo Perdido](../docs/modo-perdido.md)
+- [x] **Prototype:** installable web app (PWA) that simulates the Survival OS interface ([`app/`](app))
+- [ ] **Dedicated distro:** it is product vision, it does not exist yet
+- [ ] [Lost Mode (*Modo Perdido*)](../docs/modo-perdido.md) (in Portuguese)
 
-## O que o protótipo tem
+## What the prototype has
 
-- Três telas, com navegação por abas: **Mapa**, **Guia** e **Traje**
-- Mapa real de Marte (tiles do Mars Trek) salvo no dispositivo
-- Alerta em tela cheia + vibração quando um sensor simulado passa do limite
-- Funcionamento offline (service worker) e instalação como app (manifest)
-- Tema claro/escuro automático, alvos de toque grandes
+- Three screens, with tab navigation: **Mapa** (Map), **Guia** (Guide) and **Traje** (Suit)
+- Real map of Mars (Mars Trek tiles) saved on the device
+- Full-screen alert + vibration when a simulated sensor crosses its limit
+- Offline operation (service worker) and installation as an app (manifest)
+- Automatic light/dark theme, large touch targets
 
-## Arquivos
+## Files
 
-| Arquivo | Função |
-|---------|--------|
-| `app/index.html` | Telas, estilos e lógica (HTML + CSS + JS em um arquivo) |
-| `app/sw.js` | Service worker, cache-first: guarda o app e todos os tiles |
-| `app/manifest.webmanifest` | Nome, ícones e modo de tela cheia do app instalado |
-| `app/vendor/` | Leaflet 1.9.4 (local, sem CDN) |
-| `app/icons/` | Ícones do app |
-| `app/assets/tiles/` | Tiles do Mars Trek + `lista.json` |
+| File | Role |
+|------|------|
+| `app/index.html` | Screens, styles and logic (HTML + CSS + JS in a single file) |
+| `app/sw.js` | Service worker, cache-first: stores the app and all the tiles |
+| `app/manifest.webmanifest` | Name, icons and full-screen mode of the installed app |
+| `app/vendor/` | Leaflet 1.9.4 (local, no CDN) |
+| `app/icons/` | App icons |
+| `app/assets/tiles/` | Mars Trek tiles + `lista.json` (the list of tile files) |
 
-`app/assets/terreno.jpg` não é usado hoje pelo app (resto de uma versão anterior); pode ser removido.
+`app/assets/terreno.jpg` is not used by the app today (left over from an earlier version); it can be removed.
 
-## Como rodar
+## How to run
 
-Na **raiz do repositório**:
+From the **repository root**:
 
 ```bash
 python -m http.server 8000
 ```
 
-Abra **http://localhost:8000/os/app/**. Não abra o arquivo com duplo clique: o service worker não funciona em `file://`. Passo a passo e teste offline em [Como rodar](../README.md#como-rodar).
+Open **http://localhost:8000/os/app/**. Do not open the file by double-clicking it: the service worker does not work on `file://`. Step by step and the offline test in [How to run](../README.md#how-to-run).
 
-## Como mexer
+## How to work on it
 
-- Mudou qualquer arquivo em `app/`? **Aumente `VERSAO` em `sw.js`**, senão quem já abriu vê a versão antiga.
-- Para a lógica, veja os blocos de `index.html`: *Mapa*, *Dados* (`GUIAS`, `SENS`), *Abas*, *Alertas*, *Satélite/offline*.
-- Nova região de mapa: ver [`../mapa/README.md`](../mapa/README.md).
-- Dados fixos usam `innerHTML`. Se algum dia vierem de fora (traje, rede), troque por `textContent`.
+- Changed any file in `app/`? **Increase `VERSAO` (the cache version) in `sw.js`**, otherwise anyone who has already opened the app sees the old version.
+- For the logic, see the blocks in `index.html`: *Mapa* (Map), *Dados* (Data: `GUIAS`, `SENS`), *Abas* (Tabs), *Alertas* (Alerts), *Satélite/offline* (Satellite/offline).
+- New map region: see [`../mapa/README.md`](../mapa/README.md).
+- Fixed data uses `innerHTML`. If it ever comes from outside (suit, network), switch to `textContent`.
 
-## Do protótipo à distro (visão)
+## From prototype to distro (vision)
 
-1. Manter o app como a interface do sistema.
-2. Rodar sobre uma base Linux mínima em hardware pequeno, abrindo direto no app.
-3. Medir consumo e ajustar.
+1. Keep the app as the system interface.
+2. Run it on a minimal Linux base on small hardware, opening straight into the app.
+3. Measure power consumption and tune.
 
-Detalhes e decisões em [`../docs/arquitetura.md`](../docs/arquitetura.md).
+Details and decisions in [`../docs/arquitetura.md`](../docs/arquitetura.md) (in Portuguese).
 
-## Limitações
+## Limitations
 
-- Telemetria, posições, rota e guia são de **exemplo**.
-- O botão "Satélite" só alterna um estado na tela.
-- Acessibilidade por teclado incompleta (foco preso no alerta, setas nas abas).
-- Nunca testado em hardware pequeno nem com luvas.
+- Telemetry, positions, route and guide are **examples**.
+- The "Satélite" (Satellite) button only toggles a state on the screen.
+- Keyboard accessibility is incomplete (focus trapped in the alert, arrow keys on the tabs).
+- Never tested on small hardware or with gloves.

@@ -1,50 +1,50 @@
 
 
-# Traje inteligente
+# Smart suit
 
-Identificação de situações críticas pelo traje espacial e envio de alertas ao dispositivo. *Sugestão: João.*
+Identification of critical situations by the spacesuit and sending of alerts to the device. *Suggestion: João.*
 
 ## Status
 
-- [x] Simulação de 4 sensores no app, com alerta em tela cheia + vibração ([`os/app/index.html`](../os/app/index.html))
-- [x] Cada alerta liga ao checklist certo e à rota até o abrigo
-- [ ] Protocolo real de telemetria (traje → dispositivo)
-- [ ] Limites validados com fontes da NASA
-- [ ] Teste com hardware real
+- [x] Simulation of 4 sensors in the app, with a full-screen alert + vibration ([`os/app/index.html`](../os/app/index.html))
+- [x] Each alert links to the right checklist and to the route to the shelter
+- [ ] Real telemetry protocol (suit → device)
+- [ ] Limits validated with NASA sources
+- [ ] Test with real hardware
 
-> A telemetria é **simulada** por controles deslizantes na aba Traje. Nada aqui lê um traje real.
+> The telemetry is **simulated** by sliders on the **Traje** (Suit) tab. Nothing here reads a real suit.
 
-## Sensores simulados e limites
+## Simulated sensors and limits
 
-Definidos em `SENS` no `index.html`. São **exemplos da equipe**, não valores oficiais.
+Defined in `SENS` (sensors) in `index.html`. They are **team examples**, not official values.
 
-| Sensor | Faixa | Alerta quando | Checklist aberto |
-|--------|-------|---------------|------------------|
-| Reserva de O₂ | 0–100 % | < 20 % | Pouco oxigênio |
-| Pressão do traje | 10–35 kPa | < 24 kPa | Perda de pressão |
-| Temperatura interna | 10–45 °C | > 30 °C | Temperatura alta |
-| Poeira no ar | 0–100 % | > 70 % | Tempestade de poeira |
+| Sensor | Range | Alert when | Checklist opened |
+|--------|-------|------------|------------------|
+| O₂ reserve (*Reserva de O₂*) | 0–100% | < 20% | Pouco oxigênio (Low oxygen) |
+| Suit pressure (*Pressão do traje*) | 10–35 kPa | < 24 kPa | Perda de pressão (Pressure loss) |
+| Internal temperature (*Temperatura interna*) | 10–45 °C | > 30 °C | Temperatura alta (High temperature) |
+| Airborne dust (*Poeira no ar*) | 0–100% | > 70% | Tempestade de poeira (Dust storm) |
 
-## Comportamento do alerta
+## Alert behavior
 
-1. Valor ultrapassa o limite → alerta em tela cheia, vibração (`navigator.vibrate`) e banner crítico no Mapa.
-2. O usuário escolhe: **Ver rota até o abrigo**, **Abrir checklist** ou **Dispensar**.
-3. Dispensado, o alerta daquele sensor só volta depois que o valor retornar ao normal.
-4. Quando nenhum sensor está fora do limite, o banner volta ao normal e a rota some.
+1. A value crosses its limit → full-screen alert, vibration (`navigator.vibrate`) and a critical banner on the Mapa (Map) tab.
+2. The user chooses: **Ver rota até o abrigo** (View route to the shelter), **Abrir checklist** (Open checklist) or **Dispensar** (Dismiss).
+3. Once dismissed, that sensor's alert only comes back after the value returns to normal.
+4. When no sensor is out of range, the banner goes back to normal and the route disappears.
 
-## Para testar
+## To test
 
-Aba **Traje** → arraste a *Reserva de O₂* para menos de 20 % (ver [Como rodar](../README.md#como-rodar)).
+**Traje** tab → drag *Reserva de O₂* (O₂ reserve) below 20% (see [How to run](../README.md#how-to-run)).
 
-## Ideias para a integração real (a definir)
+## Ideas for the real integration (to be defined)
 
-- Qual canal liga traje e dispositivo (cabo, rádio de curto alcance) e que formato de mensagem trafega.
-- Mensagem mínima por leitura: sensor, valor, unidade, hora. Mensagem de alerta: sensor, nível, hora.
-- Prioridade dos alertas quando mais de um dispara ao mesmo tempo (hoje: o primeiro da lista).
-- O oxigênio restante alimenta a escolha do abrigo no [Modo Perdido](../docs/modo-perdido.md).
-- Falha segura: se a telemetria sumir, o dispositivo deve avisar, e não assumir que está tudo bem.
+- Which channel connects suit and device (cable, short-range radio) and what message format travels over it.
+- Minimum message per reading: sensor, value, unit, time. Alert message: sensor, level, time.
+- Alert priority when more than one fires at the same time (today: the first in the list).
+- The remaining oxygen feeds the shelter choice in [Lost Mode (*Modo Perdido*)](../docs/modo-perdido.md) (in Portuguese).
+- Fail-safe: if the telemetry disappears, the device must warn the user, not assume everything is fine.
 
-## Pendências
+## Open items
 
-- Definir com fontes oficiais os limites e as unidades de cada sensor.
-- Decidir outros sensores a incluir (ex.: CO₂, radiação, batimentos).
+- Define the limits and units of each sensor with official sources.
+- Decide which other sensors to include (e.g. CO₂, radiation, heart rate).

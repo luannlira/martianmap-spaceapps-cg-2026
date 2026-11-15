@@ -1,9 +1,9 @@
-# Guia de sobrevivência
+# Survival guide
 
-Conteúdo offline do guia: procedimentos, emergências e checklists.
+Offline guide content: procedures, emergencies and checklists.
 
 ## Status
-- [ ] A definir
+- [ ] To be defined
 
-## Notas
-*(a preencher)*
+## Notes
+*(to be filled in)*

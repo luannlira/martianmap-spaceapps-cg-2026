@@ -1,63 +1,63 @@
-# Dados
+# Data
 
-De onde veio cada dado (NASA / agências parceiras) e como obtê-lo. Arquivos grandes ficam fora do repositório; aqui só links e amostras pequenas (`samples/`).
+Where each dataset came from (NASA / partner agencies) and how to obtain it. Large files stay outside the repository; only links and small samples (`samples/`) are kept here.
 
-## Fontes
+## Sources
 
-### NASA/JPL Mars Trek: mapa de terreno
+### NASA/JPL Mars Trek: terrain map
 
-| Item | Valor |
+| Item | Value |
 |------|-------|
 | Portal | [trek.nasa.gov/mars](https://trek.nasa.gov/mars/) |
-| Catálogo de camadas | [trekAPI](https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=mars) |
-| Serviço | WMTS (tiles) |
-| Camada | `Mars_Viking_MDIM21_ClrMosaic_global_232m` (mosaico colorido do Viking) |
-| Resolução | ~232 m/pixel |
-| Projeção | Equiretangular (EPSG:4326) |
-| Região baixada | 13–23°N, 72–82°E (~590 × 560 km) |
-| Zoom | 0 a 7 (o zoom 8 dá 404 nessa camada) |
+| Layer catalog | [trekAPI](https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=mars) |
+| Service | WMTS (tiles) |
+| Layer | `Mars_Viking_MDIM21_ClrMosaic_global_232m` (Viking color mosaic) |
+| Resolution | ~232 m/pixel |
+| Projection | Equirectangular (EPSG:4326) |
+| Downloaded region | 13–23°N, 72–82°E (~590 × 560 km) |
+| Zoom | 0 to 7 (zoom 8 returns 404 on this layer) |
 | Tiles | 107 (~6 MB) |
-| Formato | JPG, 256 × 256 |
+| Format | JPG, 256 × 256 |
 
-**Como obter:**
+**How to obtain it:**
 
 ```bash
 python mapa/baixar_tiles.py
 ```
 
-Os tiles vão para `os/app/assets/tiles/` e já estão versionados no repositório. Detalhes em [`../mapa/README.md`](../mapa/README.md).
+The tiles go to `os/app/assets/tiles/` and are already versioned in the repository. Details in [`../mapa/README.md`](../mapa/README.md).
 
-**Uso no app:** baixados uma vez, servidos localmente. O app **não consulta a NASA em tempo de uso**.
+**Use in the app:** downloaded once, served locally. The app **does not query NASA at runtime**.
 
-**Atribuição:** aparece no canto do mapa (`NASA/JPL Mars Trek · <camada>`).
+**Attribution:** shown in the corner of the map (`NASA/JPL Mars Trek · <layer>`).
 
-**Termos de uso:** confirme na página de cada produto do Mars Trek antes de redistribuir.
+**Terms of use:** check the page of each Mars Trek product before redistributing.
 
-## Dados que ainda faltam
+## Data still missing
 
-| Dado | Para quê | Estado |
+| Data | What for | Status |
 |------|----------|--------|
-| Camada de **elevação** (relevo) do Mars Trek | Declividade da rota e Modo Perdido | A escolher no catálogo |
-| Lista de **abrigos** | Destino da rota e do Modo Perdido | A definir (hoje há um de exemplo) |
-| Efemérides do Sol para Marte | Estimar posição pelo ângulo do Sol | A definir |
-| Limites de sensores do traje | Alertas | Hoje são exemplos da equipe |
-| Procedimentos de emergência | Guia | Hoje são exemplos da equipe |
+| Mars Trek **elevation** (relief) layer | Route slope and Lost Mode (*Modo Perdido*) | To be chosen from the catalog |
+| List of **shelters** | Destination of the route and of Lost Mode | To be defined (today there is one example) |
+| Solar ephemerides for Mars | Estimating position from the Sun's angle | To be defined |
+| Suit sensor limits | Alerts | Today they are team examples |
+| Emergency procedures | Guide | Today they are team examples |
 
-## Dados simulados (não vêm de fontes reais)
+## Simulated data (not from real sources)
 
-- Telemetria do traje (controles deslizantes)
-- Posições de "Você" e do abrigo, zona de risco e rota
-- Bateria exibida (94 %)
+- Suit telemetry (sliders)
+- Positions of "Você" (You) and the shelter, risk zone and route
+- Displayed battery (94%)
 
-## Dependência de terceiros
+## Third-party dependency
 
-[Leaflet](https://leafletjs.com) 1.9.4 (BSD-2-Clause), em `os/app/vendor/`.
+[Leaflet](https://leafletjs.com) 1.9.4 (BSD-2-Clause), in `os/app/vendor/`.
 
-## Estrutura
+## Structure
 
 ```
 data/
-|-- README.md    # este arquivo
-|-- samples/     # (opcional) amostras pequenas
-`-- raw/         # ignorado pelo git (.gitignore): arquivos grandes locais
+|-- README.md    # this file
+|-- samples/     # (optional) small samples
+`-- raw/         # ignored by git (.gitignore): large local files
 ```

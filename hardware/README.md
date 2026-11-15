@@ -1,9 +1,9 @@
-# Hardware e energia
+# Hardware and power
 
-Formato do dispositivo (pequeno ou maior, compatível com trajes), bateria de longa duração e requisitos físicos.
+Device form factor (small or larger, compatible with spacesuits), long battery life and physical requirements.
 
 ## Status
-- [ ] A definir
+- [ ] To be defined
 
-## Notas
-*(a preencher)*
+## Notes
+*(to be filled in)*
