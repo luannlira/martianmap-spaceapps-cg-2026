@@ -24,7 +24,6 @@ self.addEventListener('install', event => {
 const r = await Promise.allSettled(lista.map(u => cache.add(u)));
 const falhas = r.filter(x => x.status === 'rejected').length;
 if (falhas) console.warn(`SW: ${falhas} de ${lista.length} tiles não foram guardados`);
-      await cache.addAll(lista);
     } catch (e) { console.warn('SW: não consegui guardar os tiles', e); }
     await self.skipWaiting();
   })());
