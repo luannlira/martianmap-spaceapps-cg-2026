@@ -20,7 +20,10 @@ self.addEventListener('install', event => {
     const cache = await caches.open(VERSAO);
     await cache.addAll(APP);                       // o essencial: se falhar, a instalação falha
     try {                                          // os tiles: melhor esforço
-      const lista = await (await fetch('assets/tiles/lista.json', { cache: 'no-cache' })).json();
+    const lista = await (await fetch('assets/tiles/lista.json', { cache: 'no-cache' })).json();
+const r = await Promise.allSettled(lista.map(u => cache.add(u)));
+const falhas = r.filter(x => x.status === 'rejected').length;
+if (falhas) console.warn(`SW: ${falhas} de ${lista.length} tiles não foram guardados`);
       await cache.addAll(lista);
     } catch (e) { console.warn('SW: não consegui guardar os tiles', e); }
     await self.skipWaiting();
@@ -29,7 +32,8 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    for (const k of await caches.keys()) if (k !== VERSAO) await caches.delete(k);
+for (const k of await caches.keys())
+if (k.startsWith('martianmap-') && k !== VERSAO) await caches.delete(k);
     await self.clients.claim();
   })());
 });
